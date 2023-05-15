@@ -12,21 +12,62 @@ const router = express.Router();
 router.use(fileupload({createParentPath : true}));
 
 // universites that will show up in the select bar
-const universities = ['King Khalid University', 'king Sauid University'];
-
-router.get("/groups/new-group", (req, res) => {// require being loggedin
-    res.render("add.group.ejs", { university :universities});
-})
-
-
-router.post("/add-group/select-element", (req, res) => {
-    console.log(req.body);
-    const {university} = req.body;
-
-    if(!universities.includes(university)){
-        return res.status(500).json({err_msg : "Please Choose One Of The Options"});
+//const universities = ['King Khalid University', 'king Sauid University'];
+const universities = {
+    all : ["King Sauid University","King Khalid University" ],
+    university_sections : {
+        "King Sauid University" : {
+            "info" : {
+                "Computer Sinece" : ["computer enginner", "information system", "Syber security", "AI"],
+                "Enginner" : ["ssssss"],
+                "Art" : ["Writing", "Draw", "Sing"]
+        } //['computer Sinence', 'Enginner', 'Art']
+        },
+        "King Khalid University" : {
+            "info" : {
+                "Medicine" : ["Teath Medicine", "Brain Medicine", "General Medicine"],
+                "Computer Sicence" : ["Syber Security", "Database managemint", "Web developmint", "Game Developmint"],
+                "Art" : ["Acting", "Design", "Grafical Design"],
+            }
+        }// ['Computer Sicence', 'Software Enginner', 'Art'],
     }
+}
+router.get("/groups/new-group", (req, res) => {// require being loggedin
+    res.render("add.group.ejs", { university :universities.all});
 })
+
+
+//get college for html select
+    router.post("/groups/new-group/get-college", (req, res) => {
+        console.log(req.body);
+        const {university} = req.body;
+
+        if(!universities.all.includes(university)){
+            return res.status(500).json({err_msg : "Please Choose One Of The Options"});
+        }
+        // return the college
+        res.json({college  : Object.keys(universities['university_sections'][university]["info"])});
+    })
+//End
+
+router.post("/groups/new-group/get-subjects", (req, res) => {
+    console.log(req.body)
+    const {university} = req.body;
+    const {college}  = req.body;
+        
+        // check if college sent is exists
+        if(Object.keys(universities['university_sections'][university]["info"]).includes(college)){
+            // return subject if found
+            return res.json({subject: universities['university_sections'][university]["info"][college]});
+        }
+        return res.status(500).json({err_msg : "Please Choose One Of The Options"});
+
+    //End
+ 
+})
+
+
+
 
 router.post("/groups/insert-group", (req, res) => {
     console.log(req.body);

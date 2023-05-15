@@ -43,7 +43,7 @@
                                 <select onchange="getCollege(this.value)" class="form-select" name="" id="university" required>
                                     <option selected disabled value="">....</option>
                                     <% university.forEach( (item,i) => { %>
-                                        <option><%= item %></option>
+                                        <option value="<%= item %>"><%= item %></option>
                                     <% }) %>
                                 </select>
                             </div>
@@ -52,11 +52,23 @@
                             <div class="valid-feedback">Looks Good.</div>
                         </div>
 
-                        <!-- specify the university -->
+                        <!-- specify the college -->
                         <div class="col-md-5">
-                            <label for="university"> اختر الكلية </label>
+                            <label for="college"> اختر الكلية </label>
                             <div class="input-group has-validation">
-                                <select class="form-select" name="" id="university" required>
+                                <select onchange="getSubject(this.value)" class="form-select" name="" id="college" required>
+                                    <option selected disabled hidden value="">....</option>
+                                </select>
+                            </div>
+                            <div class="invalid-feedback">Please Enter Subject Name.</div>
+                            <div class="valid-feedback">Looks Good.</div>
+                        </div>
+
+                        <!-- specify the Subject -->
+                        <div class="col-md-5">
+                            <label for="subject"> Choose the Subject </label>
+                            <div class="input-group has-validation">
+                                <select class="form-select" name="" id="subject" required>
                                     <option selected disabled hidden>....</option>
                                 </select>
                             </div>
@@ -136,24 +148,63 @@
 
     <!-- fetch  -->
     <script>
-        async function getCollege(university){
-            // const sel = document.getElementById("university").value;
-            const errMsg = document.querySelector(".err_university");
-            console.log(university);
-            const res = await fetch("/add-group/select-element", {
-                method : "post",
-                credentials:"include",
-                headers : {"Content-Type" : "application/json"},
-                body : JSON.stringify({university})
-            });
-            const data = await res.json();
-            
-            //check if there is an error
-            if(data.err_msg){
-                return errMsg.innerHTML = err_msg
+
+        // fetch college basead on the university
+            async function getCollege(university){
+                // const sel = document.getElementById("university").value;
+                const errMsg = document.querySelector(".err_university");
+                const college = document.querySelector("#college");
+                console.log(university);
+                const res = await fetch("/groups/new-group/get-college", {
+                    method : "post",
+                    credentials:"include",
+                    headers : {"Content-Type" : "application/json"},
+                    body : JSON.stringify({university})
+                });
+                const data = await res.json();
+                console.log(data);
+                //check if there is an error
+                if(data.err_msg){
+                    return errMsg.innerHTML = err_msg;
+                }
+
+                //add option to select college
+                college.innerHTML = '<option selected disabled hidden>....</option>'
+                data.college.forEach((item) => {
+                    college.innerHTML += `<option value="${item}">${item}</option>`
+                })    
             }
-        }
+        //End
+
+
+        // fetch the Subject based on the college
+            async function getSubject(college){
+                const university = document.querySelector("#university").value;
+                console.log("@", college)
+                const subject = document.querySelector("#subject");
+                
+                const res = await fetch("/groups/new-group/get-subjects", {
+                    method : "post",
+                    credentials:"include",
+                    headers : {"Content-Type" : "application/json"},
+                    body : JSON.stringify({university, college})
+                });
+                const data = await res.json();
+                console.log(data);
+                if(data.err_msg){
+                    return;
+                }
+
+                //add option to select Subject
+                subject.innerHTML = '<option selected disabled hidden>....</option>';
+                data.subject.forEach((item,i) => {
+                    subject.innerHTML += `<option value="${i}">${item}</option>`
+                })
+            }
+        //End
     </script>
+
+
     <!-- validate inputs -->
     <script>
         (function () {
