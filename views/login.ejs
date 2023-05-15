@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <title>Login</title>
+</head>
+<body>
+    Login
+    <div class="container">
+        <div class="card">
+          <div class="card-body">
+        <form onsubmit="submitForm(event)" class="form g-3 needs-validation">
+          <div class="">
+            <!-- Error messages -->
+            <span style="color:red" class="response"></span>
+
+            <!-- Start username feild -->
+            <div class="col-md-4">
+              <label for="username" class="form-label">Username</label>
+              <div class="input-group has-validation">
+                <span class="input-group-text" id="inputGroupPrepend">@</span>
+                <input name="username" type="text" class="form-control" id="usernameField" aria-describedby="inputGroupPrepend" required>
+              </div>
+            </div>
+            <!-- End username feild -->
+
+            <!-- Start Password feild -->
+            <div class="col-md-4">
+              <label for="password" class="form-label">password</label>
+              <div class="input-group has-validation">
+                <span class="input-group-text" id="inputGroupPrepend">!</span>
+                <input name="password" type="password" class="form-control" id="passwordField" aria-describedby="inputGroupPrepend" required>
+              </div>
+            </div>
+            <!-- End Psssword Feild -->
+
+            <div class="col-12">
+              <button type="submit" class="button btn btn-primary">Submit form</button>
+            </div>
+
+          </div>
+        </form> 
+          </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.querySelector('.form');
+        const email = document.querySelector("#usernameField");
+        const password = document.querySelector("#passwordField");
+        const message = document.querySelector(".response");
+        const submitBtn = document.querySelector(".button");
+
+        function submitForm(e) {
+            e.preventDefault();
+            console.log("something")
+            
+            // // check if feilds are filled
+            // if(!email.value || !password.value){
+            //     return message.innerHTML = 'Please Fill the Form';
+            // }
+
+            // send data
+            fetch("/login", {
+                method : 'POST',
+                credentials :"include",
+                headers : {"Content-Type" : "application/json"},
+                body : JSON.stringify({
+                    email : email.value,
+                    password : password.value
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                if(data.err_msg){
+                    message.innerHTML = data.err_msg;
+                }
+            })
+        }
+    </script>
+</body>
+</html>
